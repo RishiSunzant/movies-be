@@ -9,7 +9,8 @@
     "test": "vitest run",
     "migrate": "dotenv -e .env -- node-pg-migrate -m migrations --migration-file-language sql",
     "migrate:up": "npm run migrate -- up",
-    "migrate:down": "npm run migrate -- down"
+    "migrate:down": "npm run migrate -- down",
+    "seed": "tsx scripts/seed.ts"
   },
   "keywords": [],
   "author": "",
