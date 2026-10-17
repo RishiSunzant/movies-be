@@ -3,7 +3,7 @@ import pinoHttp from "pino-http";
 import { logger } from "./shared/logger";
 import { pool } from "./shared/db";
 import { redis } from "./shared/redis";
-
+import { catalogRouter } from "./modules/catalog/catalog.routes";
 export const app = express();
 
 app.use(pinoHttp({ logger }));
@@ -17,3 +17,4 @@ app.get("/health", async (_req, res) => {
     res.status(503).json({ status: "unhealthy" });
   }
 });
+app.use("/api/v1", catalogRouter);
