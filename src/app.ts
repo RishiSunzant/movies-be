@@ -4,8 +4,11 @@ import { logger } from "./shared/logger";
 import { pool } from "./shared/db";
 import { redis } from "./shared/redis";
 import { catalogRouter } from "./modules/catalog/catalog.routes";
+import { authRouter } from "./modules/auth/auth.routes";
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
+import { AppError } from "./shared/errors";
+
 export const app = express();
 
 app.use(pinoHttp({ logger }));
@@ -20,6 +23,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 app.use("/api/v1", catalogRouter);
+app.use("/api/v1", authRouter);
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ZodError) {
@@ -30,6 +34,11 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
         message: i.message,
       })),
     });
+  }
+  if (err instanceof AppError) {
+    return res
+      .status(err.status)
+      .json({ error: err.code, message: err.message });
   }
 
   req.log.error(err); // full details go to our logs only
