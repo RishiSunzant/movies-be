@@ -1,22 +1,14 @@
-import { randomBytes, scrypt } from "node:crypto";
+import { hash } from "@node-rs/argon2";
 import { AppError } from "../../shared/errors";
 import { authRepository } from "./auth.repository";
 
-async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16).toString("hex");
-  const hash = await new Promise<Buffer>((resolve, reject) => {
-    scrypt(password, salt, 64, (error, derivedKey) => {
-      if (error) reject(error);
-      else resolve(derivedKey);
-    });
-  });
-
-  return `scrypt$${salt}$${hash.toString("hex")}`;
-}
-
 export const authService = {
   async register(input: { email: string; password: string; name: string }) {
-    const passwordHash = await hashPassword(input.password);
+    const passwordHash = await hash(input.password, {
+      memoryCost: 19456, // 19 MiB of memory per hash
+      timeCost: 2, // 2 passes
+      parallelism: 1,
+    });
 
     try {
       return await authRepository.createUser({
