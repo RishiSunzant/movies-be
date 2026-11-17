@@ -21,4 +21,11 @@ export const authRepository = {
     );
     return rows[0] ?? null;
   },
+  async findById(id: string) {
+    const { rows } = await pool.query(
+      `SELECT id, email, name, role, created_at FROM users WHERE id = $1`,
+      [id],
+    );
+    return rows[0] ?? null;
+  },
 };
