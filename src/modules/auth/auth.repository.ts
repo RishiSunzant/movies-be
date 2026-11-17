@@ -14,4 +14,11 @@ export const authRepository = {
     );
     return rows[0];
   },
+  async findByEmail(email: string) {
+    const { rows } = await pool.query(
+      `SELECT id, email, name, role, password_hash FROM users WHERE email = $1`,
+      [email],
+    );
+    return rows[0] ?? null;
+  },
 };
